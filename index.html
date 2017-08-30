@@ -22,6 +22,7 @@
     #instructions   { color: #999; font-size: 9pt; margin-left: 1em; margin-top: 0.5em; }
     #instructions b { color: #DDD; }
     @media screen and (min-width:     0px) and (min-height:    0px) { .prompt-container, #tower { width:  320px; height: 240px; font-size:  9pt; } } /* pr edit - block = 10 */
+    @media screen and (min-width:   408px) and (min-height:  288px) { .prompt-container, #tower { width:  408px; height: 288px; font-size:  9pt; } } /* pr edit - block = 12 */
     @media screen and (min-width:   512px) and (min-height:  384px) { .prompt-container, #tower { width:  512px; height: 384px; font-size:  9pt; } } /* pr edit - block = 16 */
 
     @media screen and (min-width:   640px) and (min-height:  480px) { .prompt-container, #tower { width:  640px; height: 480px; font-size:  9pt; } } /* block = 20 */
@@ -29,10 +30,10 @@
     @media screen and (min-width:  1096px) and (min-height:  722px) { .prompt-container, #tower { width:  896px; height: 672px; font-size: 13pt; } } /* block = 28 */
     @media screen and (min-width:  1224px) and (min-height:  818px) { .prompt-container, #tower { width: 1024px; height: 768px; font-size: 15pt; } } /* block = 32 */
 
-    /*#mobilebuttons{ display: none; }*/
+    #mobilebuttons{ display: none; }
 
     @media only screen and (max-device-width: 1200px){
-      /*#mobilebuttons{ display: block; }*/
+      #mobilebuttons{ display: block; }
 
       /* disable selection on mobile to prevent bugs */
       *{
@@ -53,7 +54,7 @@
       margin: 2em 1em;
       padding: 12px;
     	background-color: #eee;
-    	z-index: 2;
+    	z-index: 3;
     }
 
     .player-selection{
@@ -96,6 +97,7 @@
       position: absolute;
       width: 100%;
       height: 100%;
+      z-index: 2;
     }
     #overlay{
       position: fixed;
@@ -122,7 +124,7 @@
     }
     #mobilebuttons .up{
       top: 3%;
-      left: 50%;
+      left: 45%;
     }
     #mobilebuttons .down{
       top: auto;
@@ -193,8 +195,8 @@
 
     <div id="instructions">
       <p><b>Touches fléchées</b> pour bouger, <b>espace</b> pour sauter.</p>
-      <p>Animations: CC-BY Pascal Wassmer, adaptation du code: Paul Ronga, images: Keystone, musique: <a href="http://freemusicarchive.org/music/Visager/Songs_From_An_Unmade_World_2/Visager_-_Songs_From_An_Unmade_World_2_-_04_Factory_Time">Factory Time</a> par Visager.
-        Basé sur le jeu <a href="https://github.com/jakesgordon/javascript-tower-platformer">Javascript Tower Platformer</a>, inspiré par le jeu <a href="https://fr.wikipedia.org/wiki/Nebulus">Nebulus (Tower Toppler)</a>. Musique: 8 Bit Raceway par Wizwars.</p>
+      <p>Animations: CC-BY Pascal Wassmer, adaptation du code: Paul Ronga, photos: Keystone, musique: <a href="http://freemusicarchive.org/music/Visager/Songs_From_An_Unmade_World_2/Visager_-_Songs_From_An_Unmade_World_2_-_04_Factory_Time">Factory Time</a> par Visager.
+        Basé sur le jeu <a href="https://github.com/jakesgordon/javascript-tower-platformer">Javascript Tower Platformer</a> par Jakes Gordon, inspiré par <a href="https://fr.wikipedia.org/wiki/Nebulus">Nebulus (Tower Toppler)</a>. Musique: 8 Bit Raceway par Wizwars.</p>
       <p>Sources (licence MIT) sur <a target="_blank" href="https://github.com/palrogg/minijeu-course-conseil-federal">GitHub</a></p>
       <span id="debug"></span>
     </div>
