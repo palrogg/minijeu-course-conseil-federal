@@ -38,7 +38,8 @@
         BACK:  { x: 2016, y: 0, w: 72, h: 96, frames: 1,  fps: 30 },        // animation - player standing still with back to camera (on ladder but not moving)
         CLIMB: { x: 2016, y: 0, w: 72, h: 96, frames: 11, fps: 30 },        // animation - player climbing ladder
         HURTL: { x: 1080, y: 0, w: 72, h: 96, frames: 1,  fps: 10 },        // animation - player hurt while running left
-        HURTR: { x: 1152, y: 0, w: 72, h: 96, frames: 1,  fps: 10 }         // animation - player hurt while running right
+        HURTR: { x: 1152, y: 0, w: 72, h: 96, frames: 1,  fps: 10 },         // animation - player hurt while running right
+        WIN: { x: 2808, y: 0, w: 72, h: 96, frames: 2,  fps: 5 }
       },
       MONSTERS = [
         { name: "BLOCK", nx: -0.5, ny: -0.5, w: 1.5*METER, h: 1.5*METER, speed: 4*METER, dir: 'up',    vertical: true,  horizontal: false, animation: { up:   { x:   0, y:  0, w: 50, h: 50, frames: 2, fps: 5 }, down:  { x:   0, y:  0, w: 50, h: 50, frames: 2, fps: 5 } } },
@@ -50,12 +51,6 @@
   //===========================================================================
   // VARIABLES
   //===========================================================================
-
-  /*if($(window).width() < 720){
-    console.log('small screen')
-    WIDTH = 280;
-    $('#tower').width(WIDTH - 10);
-  }*/
 
   var tower,
       monsters,
@@ -87,7 +82,6 @@
   //===========================================================================
 
   function run() {
-    console.log('run() called')
     Game.Load.images(IMAGES, function(images) {
       Game.Load.json("levels/level1", function(level) {
         setup(images, level);
@@ -130,7 +124,7 @@
   }
   function doCheat(){
     /* not anymore
-    player.y += 200; */
+    player.y += 200;*/
   }
   function logHeight(){
     console.log('Current height: ' + player.y);
@@ -370,6 +364,8 @@
         Game.animate(FPS, this, PLAYER.LEFT);
       }else if (this.input.right || (this.stepping == DIR.RIGHT)){
         Game.animate(FPS, this, PLAYER.RIGHT);
+      }else if(playerDidWin){
+        Game.animate(FPS, this, PLAYER.WIN);
       }else if (player.y > 3750){
         if(player.score < 1){ // 124
           if(!playerLackedOfVoices)
@@ -383,11 +379,14 @@
           }
         }else{ // enough voices
           if(!playerDidWin){
-            playerDidWin = true;
-            audio.pause();
-            var successAudio = new Audio('sound/success.mp3');
-            successAudio.play();
-            var isClimbing = false;
+            playerDidWin = true; // prevents double event and triggers win animation
+
+            if(audio){
+              audio.pause();
+              var successAudio = new Audio('sound/success.mp3');
+              successAudio.play();
+            }
+
             $('#prompt').html(`<h1>Vous avez gagné! </h1>
               <p>Votre candidat a gagné la course au Conseil fédéral avec <b>${player.score} voix</b>.</p>
               `);
@@ -1159,9 +1158,6 @@
   if($(document).width() > 900){
     // enable music by default
     $('#music').prop('checked', true);
-    console.log('chk')
-  }else{
-    console.log('small scr')
   }
 
   $('#playButton').click(function(){
@@ -1173,6 +1169,7 @@
         audio.play();
       });
     }
+    console.log(audio);
     console.log('Selected player: ' + $('ul.player-selection li.selected').data('player'))
     $('#prompt, #overlay').hide();
     run();
