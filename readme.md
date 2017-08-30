@@ -1,4 +1,4 @@
-Un minijeu sur la course au Conseil fédéral basé sur [Tower Platformer](https://github.com/jakesgordon/javascript-tower-platformer), par Jakes Gordon.
+Un minijeu sur la course au Conseil fédéral basé sur [Javascript Tower Platformer](https://github.com/jakesgordon/javascript-tower-platformer), par Jakes Gordon.
 
 Code en licence MIT. Les images contiennent des photos de Keystone et ne peuvent être partagées en licence libre.
 
