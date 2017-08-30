@@ -1,8 +1,8 @@
 Un minijeu sur la course au Conseil fédéral basé sur [Javascript Tower Platformer](https://github.com/jakesgordon/javascript-tower-platformer), par Jakes Gordon.
 
-[![Teaser](https://files.newsnetz.ch/upload//1/3/137559.png?400)](https://files.newsnetz.ch/extern/interactive_wch/tdg/course_federale.html?3)
+[![Teaser](https://files.newsnetz.ch/upload//1/3/137559.png?400)](https://files.newsnetz.ch/extern/interactive_wch/tdg/course_federale/)
 
-Jouez-y [ici](https://files.newsnetz.ch/extern/interactive_wch/tdg/course_federale.html?3) ou [ici](https://files.newsnetz.ch/extern/interactive_wch/course_federale/) !
+Jouez-y [ici](https://files.newsnetz.ch/extern/interactive_wch/tdg/course_federale/) ou [ici](https://files.newsnetz.ch/extern/interactive_wch/course_federale/) !
 
 Code en licence MIT. Les images contiennent des photos de Keystone et ne peuvent être partagées en licence libre.
 
