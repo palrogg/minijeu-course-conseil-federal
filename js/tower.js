@@ -1168,6 +1168,10 @@
     if( $("#music").is(':checked') ){
       if(!audio){
         audio = new Audio('sound/Visager_-_04_-_Factory_Time.mp3');
+        $(audio).bind('ended', function()  {
+          audio.currentTime = 0;
+          audio.play();
+        });
       }
       audio.play();
     }else{
