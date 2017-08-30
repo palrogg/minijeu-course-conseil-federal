@@ -146,7 +146,6 @@
   }
 
   function onMobileButton(movement, pressed){
-    console.log('Called for' + movement + 'and' + pressed)
     switch(movement){
       case "left":  player.input.left  = pressed; return false;
       case "right": player.input.right = pressed; return false;
@@ -367,13 +366,13 @@
       }else if(playerDidWin){
         Game.animate(FPS, this, PLAYER.WIN);
       }else if (player.y > 3750){
-        if(player.score < 1){ // 124
+        if(player.score < 124){ // 124
           if(!playerLackedOfVoices)
           {
             playerLackedOfVoices = true;
             $('#prompt').html(`<h1>Trop peu de voix </h1>
               <p>Votre candidat n’a que ${player.score} voix! Il a été recalé.</p>
-              <p>Tout n’est pas perdu: réessayez après avoir récupéré davantage de bulletins de vote...</p>
+              <p>Tout n’est pas perdu: réessayez après avoir récupéré au moins 124 bulletins de vote...</p>
               `);
             $('#prompt').show(500);
           }
@@ -1158,19 +1157,31 @@
   if($(document).width() > 900){
     // enable music by default
     $('#music').prop('checked', true);
+    audio = new Audio('sound/Visager_-_04_-_Factory_Time.mp3');
+    audio.play();
+    $(audio).bind('ended', function()  {
+      audio.currentTime = 0;
+      audio.play();
+    });
   }
+  $('.checkbox').click(function(){
+    if( $("#music").is(':checked') ){
+      if(!audio){
+        audio = new Audio('sound/Visager_-_04_-_Factory_Time.mp3');
+      }
+      audio.play();
+    }else{
+      if(audio){
+        audio.pause();
+      }
+    }
+
+  });
+
 
   $('#playButton').click(function(){
-    if( $("#music").is(':checked') ){
-      audio = new Audio('sound/Visager_-_04_-_Factory_Time.mp3');
-      audio.play();
-      $(audio).bind('ended', function()  {
-        audio.currentTime = 0;
-        audio.play();
-      });
-    }
-    console.log(audio);
     console.log('Selected player: ' + $('ul.player-selection li.selected').data('player'))
+    $('#coin').attr('src', 'images/coin_' + $('ul.player-selection li.selected').data('player') + '.png')
     $('#prompt, #overlay').hide();
     run();
   })
