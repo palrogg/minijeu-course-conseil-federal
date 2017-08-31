@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:title" content="Mini jeu: Moret, Maudet et Cassis à l’assaut de Berne" />
+  <meta name="description" content="Récoltez des voix et tentez d’atteindre le palais fédéral" />
+  <meta name='og:image' content='https://files.newsnetz.ch/upload//1/3/137559.png?2' />
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+  <title>Mini jeu: Moret, Maudet et Cassis à l’assaut de Berne</title>
+
+  <link href='https://fonts.googleapis.com/css?family=Cherry+Swash' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+    body            { background: #111; }
+    #tower          { position: relative; margin: 4em auto; width: 512px; height: 384px; border: 1px solid #ccc; }
+    #hud            { position: absolute; bottom: 0em; width: 9em; background-color: red; opacity: 0.6; border: 2px solid black; }
+    .scorecontainer { text-align: right; }
+    #score          { color: #fff; padding-left: 1em; font-size: 2em; font-family: 'Cherry Swash', cursive; }
+    #canvas         { display: inline-block; width: 100%; height: 100%; }
+    #instructions   { color: #999; font-size: 9pt; margin-left: 1em; margin-top: 0.5em; }
+    #instructions b { color: #DDD; }
+    @media screen and (min-width:     0px) and (min-height:    0px) { .prompt-container, #tower { width:  320px; height: 240px; font-size:  9pt; } } /* pr edit - block = 10 */
+    @media screen and (min-width:   408px) and (min-height:  288px) { .prompt-container, #tower { width:  408px; height: 288px; font-size:  9pt; } } /* pr edit - block = 12 */
+    @media screen and (min-width:   512px) and (min-height:  384px) { .prompt-container, #tower { width:  512px; height: 384px; font-size:  9pt; } } /* pr edit - block = 16 */
+
+    @media screen and (min-width:   640px) and (min-height:  480px) { .prompt-container, #tower { width:  640px; height: 480px; font-size:  9pt; } } /* block = 20 */
+    @media screen and (min-width:   968px) and (min-height:  626px) { .prompt-container, #tower { width:  768px; height: 576px; font-size: 11pt; } } /* block = 24 */
+    @media screen and (min-width:  1096px) and (min-height:  722px) { .prompt-container, #tower { width:  896px; height: 672px; font-size: 13pt; } } /* block = 28 */
+    @media screen and (min-width:  1224px) and (min-height:  818px) { .prompt-container, #tower { width: 1024px; height: 768px; font-size: 15pt; } } /* block = 32 */
+
+    #mobilebuttons{ display: none; }
+
+    @media only screen and (max-device-width: 1200px){
+      #mobilebuttons{ display: block; }
+
+      /* disable selection on mobile to prevent bugs */
+      *{
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    }
+
+    .prompt-container{
+      position: relative;
+      margin: 4em auto;
+      height: 0;
+    }
+    .name-prompt{
+      width: 100%;
+    	position: absolute;
+      padding: 2em 1em;
+    	background-color: #eee;
+    	z-index: 3;
+    }
+
+    .player-selection{
+    	display: inline-block;
+    	width: 100%;
+    	padding: 0;
+    	list-style-type: none;
+    	margin: 20px auto 0 auto;
+    }
+    .checkbox{
+      margin: 2em 2em;
+    }
+
+
+    .player-select label{
+    	display: inline-block;
+    	margin: 10px 0;
+    	width: 100%;
+    	text-align: center;
+    }
+
+    .player-selection li{
+    	display: inline-block;
+    	float: left;
+    	width: 33%;
+    	text-align: center;
+    	cursor: pointer;
+    	border: 2px solid #eee;
+    	padding: 10px 0;
+    }
+
+    .player-selection li.selected{
+    	border: 2px solid #158cba;
+    	-webkit-border-radius: 5px;
+    	   -moz-border-radius: 5px;
+    		 -o-border-radius: 5px;
+    			border-radius: 5px;
+    	border-radius: 5px;
+    }
+    #mobilebuttons{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    #overlay{
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+    #mobilebuttons button{
+      font-size: 2em;
+      position: absolute;
+    }
+    #mobilebuttons .left{
+      left: 3%;
+      top: 50%;
+    }
+    #mobilebuttons .right{
+      right: 3%;
+      top: 50%;
+    }
+    #mobilebuttons .up{
+      top: 3%;
+      left: 45%;
+    }
+    #mobilebuttons .down{
+      top: auto;
+      bottom: 3%;
+      left: 20%;
+    }
+    #mobilebuttons .jump{
+      top: auto;
+      bottom: 3%;
+      right: 20%;
+    }
+
+    div.stories{
+      display: none;
+    }
+    div.enemylink{
+      overflow: hidden;
+      height: 50px;
+      display: inline-block;
+      border: 2px solid #ccc;
+      border-radius: 3px;
+    }
+    div.enemylink img{
+      width: 836px;
+      height: 50px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <div class="prompt-container">
+    <div id="prompt" class="name-prompt">
+  	    <div class="player-select col-md-12">
+  	    	<h2>Choisissez votre candidat:</h2>
+  	      	<ul class="player-selection col-md-12">
+  	      		<li class="selected" data-player="moret">
+  	      			<img src="images/prompt/moret_front.png"><br />
+  							Isabelle Moret
+  	      		</li>
+  	      		<li data-player="maudet">
+  	      			<img src="images/prompt/maudet_front.png"><br />
+  							Pierre Maudet
+  	      		</li>
+  	      		<li data-player="cassis">
+                <img src="images/prompt/cassis_front.png"><br />
+  							Ignazio Cassis
+  	      		</li>
+  	      	</ul>
+  					</div>
+            <div class="checkbox col-md-12">
+              <label class="fullwidth"><input id="music" type="checkbox">Musique 🎵</label>
+            </div>
+            <div class="center-block">
+              <input class="btn btn-primary center-block col-md-12" type="submit" id="playButton" value="C’est parti !" />
+            </div>
+      	</div>
+	</div>
+
+  <div id="overlay"></div>
+
+  <div id="tower" class="mobilebuttons">
+    <div id="mobilebuttons">
+      <button data-mv="left" class="left glyphicon glyphicon-arrow-left"></button>
+      <button data-mv="right" class="right glyphicon glyphicon-arrow-right"></button>
+      <button data-mv="up" class="up glyphicon glyphicon-arrow-up"></button>
+      <button data-mv="down" class="down glyphicon glyphicon-arrow-down"></button>
+      <button data-mv="jump" class="jump glyphicon glyphicon-open"></button>
+    </div>
+
+    <div id="hud">
+      <table>
+        <tr><td><img id="coin" src=""></td><td class="scorecontainer"><span id="score"></span></td></tr>
+      </table>
+    </div>
+
+    <canvas id="canvas">
+      <div class="unsupported">
+        Votre navigateur ne prend malheureusement pas en charge la technologie nécessaire au jeu.
+      </div>
+    </canvas>
+
+    <div id="instructions">
+      <p><b>Touches fléchées</b> pour bouger, <b>espace</b> pour sauter. Recueillez au moins <b>124 voix</b> pour pouvoir entrer au palais fédéral!</p>
+      <p>Animations: Pascal Wassmer et Philippe Forney, adaptation du code: Paul Ronga, photos: Keystone, musique: <a href="http://freemusicarchive.org/music/Visager/Songs_From_An_Unmade_World_2/Visager_-_Songs_From_An_Unmade_World_2_-_04_Factory_Time">Factory Time</a> par Visager.
+        Basé sur le jeu <a href="https://github.com/jakesgordon/javascript-tower-platformer">Javascript Tower Platformer</a> par Jakes Gordon, inspiré par <a href="https://fr.wikipedia.org/wiki/Nebulus">Nebulus (Tower Toppler)</a>. Musique: 8 Bit Raceway par Wizwars.</p>
+      <p>Sources (licence MIT) sur <a target="_blank" href="https://github.com/palrogg/minijeu-course-conseil-federal">GitHub</a></p>
+      <span id="debug"></span>
+
+      <div class="stories stories_cassis">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Ignazio Cassis</h4>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/destin-maudit-candidates-plr-conseil-federal/story/14296426"><img src="images/monster_cassis.png" style="margin-left: 0px; margin-right: -50px" /></a></div>
+      <div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.24heures.ch/suisse/plan-secret-elire-isabelle-moret/story/11809943"><img src="images/monster_cassis.png" style="margin-left: -100px; margin-right: -176px" /></a></div>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/vaudois-pratiquent-souvent-conseil-federal/story/30329465"><img src="images/monster_cassis.png" style="margin-left: -404px; margin-right: -454px" /></a></div>
+      <div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.24heures.ch/suisse/ignazio-cassis-renonce-passeport-italien/story/15875312"><img src="images/monster_cassis.png" style="margin-left: -604px; margin-right: -662px" /></a></div>
+      </div>
+      <div class="stories stories_maudet">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Pierre Maudet</h4>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/destin-maudit-candidates-plr-conseil-federal/story/14296426"><img src="images/monster_maudet.png" style="margin-left: 0px; margin-right: -50px" /></a></div>
+      <div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.24heures.ch/suisse/plan-secret-elire-isabelle-moret/story/11809943"><img src="images/monster_maudet.png" style="margin-left: -100px; margin-right: -176px" /></a></div>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/heure-verite-isabelle-moret-pierre-maudet/story/19475092"><img src="images/monster_maudet.png" style="margin-left: -404px; margin-right: -454px" /></a></div>
+      <div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.24heures.ch/news/news/pierre-maudet-candidat-conseil-federal-berne-parler-sujets-fond/story/13980975"><img src="images/monster_maudet.png" style="margin-left: -604px; margin-right: -662px" /></a></div>
+      </div>
+      <div class="stories stories_moret">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Isabelle Moret</h4>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/Les-louvoiements-de-Moret-sur-ses-liens-d-interets/story/27752222"><img src="images/monster_moret.png" style="margin-left: 0px; margin-right: -50px" /></a></div>
+      <div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.24heures.ch/suisse/politique/Conseil-federal-femmes-de-droite-en-marche/story/22718219"><img src="images/monster_moret.png" style="margin-left: -100px; margin-right: -176px" /></a></div>
+      <div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.24heures.ch/suisse/heure-verite-isabelle-moret-pierre-maudet/story/19475092"><img src="images/monster_moret.png" style="margin-left: -404px; margin-right: -454px" /></a></div>
+      <div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.24heures.ch/suisse/heure-verite-isabelle-moret-pierre-maudet/story/19475092"><img src="images/monster_moret.png" style="margin-left: -604px; margin-right: -662px" /></a></div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="js/fpsmeter.min.js"></script>
+  <script src="js/common.js"></script>
+  <!--<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '480377685650907',
+      xfbml      : true,
+      version    : 'v2.10'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>-->
+  <script src="js/tower.js?700"></script>
+
+  <div style="height: 1px; width: 100%;"><!-- Container for Metrix -->
+        <!-- Analytics -->
+    <!-- Google Tag Manager -->
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    </script>
+    <script>
+    if (!window.googleTagManagerStarted) {
+        window.googleTagManagerStarted = true;
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src = '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-TTDLSJ');
+    }
+    </script>
+    <script>
+    var storyId = "",
+        premium = "",
+        pageType = "article",
+        category = "Long format",
+        subcategory = "default";
+    var uid = undefined;
+    try {
+        uid = JSON.parse(document.querySelector("meta[name='c1_user_info']").getAttribute("content")).user_id;
+    } catch (err) {
+        uid = undefined;
+    }
+    window.dataLayer.push({
+        "event": "pageview",
+        "pagetype": pageType,
+        "category": (category) ? category : "default",
+        "subcategory": (subcategory) ? subcategory : "default",
+        "article_id": (storyId) ? storyId : undefined,
+        "uid": uid,
+        "premium": (premium) ? premium : undefined
+    });
+    </script>
+    <!-- End Google Tag Manager -->
+    <!-- End Anlytics -->
+
+  </div><!-- End Container for Metrix -->
+
+
+
+  <script type="text/javascript" id="">if(jQuery&&window.gaplugins&&window.gaplugins.Linker){var linker=new window.gaplugins.Linker(ga.getAll()[0]);jQuery("iFrame[src]").each(function(d,b){try{var c=linker.decorate(b.src),a=this.src.split("/"),a=2<a.length?a[2]:"INVALID";c!=b.src&&(new RegExp("(^|,| )"+a+"(,|$)")).test(google_tag_manager["GTM-TBNVCG"].macro('gtm175'))&&(this.src=c)}catch(e){}})};</script><script type="text/javascript" id="">(function(){function c(a){if(a){var b;a.target&&"IFRAME"==a.target.nodeName&&((a=a.target.src)?(b=/[\?&#]url=([^&#]*)/,a=b.exec(a),b=null!=a?unescape(a[1]):void 0):b=void 0);window[google_tag_manager["GTM-TBNVCG"].macro('gtm176')].push({event:"tracksocial",socialNetwork:"twitter",socialAction:"tweet",socialTarget:b})}}var d=function(){"undefined"!=typeof FB&&"undefined"!=FB.Event&&(FB.Event.subscribe("edge.create",function(a){window[google_tag_manager["GTM-TBNVCG"].macro('gtm177')].push({event:"tracksocial",socialNetwork:"facebook",socialAction:"like",
+  socialTarget:a})}),FB.Event.subscribe("message.send",function(a){window[google_tag_manager["GTM-TBNVCG"].macro('gtm178')].push({event:"tracksocial",socialNetwork:"facebook",socialAction:"send",socialTarget:a})}),FB.Event.subscribe("comment.create",function(a){var b="";"undefined"!=a&&"undefined"!=a.href&&(b=a.href);window[google_tag_manager["GTM-TBNVCG"].macro('gtm179')].push({event:"tracksocial",socialNetwork:"facebook",socialAction:"comment",socialTarget:b})}))};d();"undefined"!=typeof twttr&&twttr.ready(function(a){a.events.bind("tweet",c)})})();</script><script type="text/javascript" id="">(function(){var g=/youtube.com/i,h="https:"==location.protocol?"https://":"http://",e={"-1":"started",0:"ended",1:"playing",2:"paused",3:"buffering",4:"?",5:"cued"},b;allplayers=[];var k=function(a){void 0==b&&(b=document.createElement("script"),b.src=a+"www.youtube.com/iframe_api",a=document.getElementsByTagName("script")[0],a.parentNode.insertBefore(b,a))};window.oldOnYouTubeIframeAPIReady=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=function(){for(var a=0;a<allplayers.length;a++)var b=
+  new YT.Player(allplayers[a],{events:{onStateChange:function(c){console.info(["trackEvent","Youtube",e[c.data],b.getVideoUrl()]);window[google_tag_manager["GTM-TBNVCG"].macro('gtm180')].push({event:"Youtube",action:e[c.data],url:b.getVideoUrl(),ytplayer:b,ytplayerinstance:a})}}});window.oldOnYouTubeIframeAPIReady&&window.oldOnYouTubeIframeAPIReady()};for(var f=document.getElementsByTagName("iframe"),d=0;d<f.length;d++){var a=f[d];if(a.src&&g.test(a.src)&&(k(0<a.src.indexOf(":")?a.src.split(":")[0]+"://":h),a.id=a.id||"player"+
+  String(Math.random()).split(".")[1],allplayers.push(a.id),-1==a.src.indexOf("enablejsapi"))){var c=a.src.split("?");c[1]="enablejsapi\x3d1\x26"+(c[1]?c[1]:"");a.src=c.join("?")}}})();</script>
+
+</body>
+</html>

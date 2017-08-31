@@ -1184,9 +1184,11 @@
 
 
   $('#playButton').click(function(){
-    console.log('Selected player: ' + $('ul.player-selection li.selected').data('player'))
-    $('#coin').attr('src', 'images/coin_' + $('ul.player-selection li.selected').data('player') + '.png')
+    var selectedPlayer = $('ul.player-selection li.selected').data('player');
+    console.log('Selected player: ' + selectedPlayer);
+    $('#coin').attr('src', 'images/coin_' + selectedPlayer + '.png')
     $('#prompt, #overlay').hide();
+    $('.stories_' + selectedPlayer).show();
     run();
   })
 

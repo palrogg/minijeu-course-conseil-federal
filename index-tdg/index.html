@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base href="https://files.newsnetz.ch/extern/interactive_wch/course_federale/" />
+  <meta property="og:title" content="Mini jeu: Moret, Maudet et Cassis à l’assaut de Berne" />
+  <meta name="description" content="Récoltez des voix et tentez d’atteindre le palais fédéral" />
+  <meta name='og:image' content='https://files.newsnetz.ch/upload//1/3/137559.png?200' />
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+  <title>Mini jeu: Moret, Maudet et Cassis à l’assaut de Berne</title>
+
+  <link href='https://fonts.googleapis.com/css?family=Cherry+Swash' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+    body            { background: #111; }
+    #tower          { position: relative; margin: 4em auto; width: 512px; height: 384px; border: 1px solid #ccc; }
+    #hud            { position: absolute; bottom: 0em; width: 9em; background-color: red; opacity: 0.6; border: 2px solid black; }
+    .scorecontainer { text-align: right; }
+    #score          { color: #fff; padding-left: 1em; font-size: 2em; font-family: 'Cherry Swash', cursive; }
+    #canvas         { display: inline-block; width: 100%; height: 100%; }
+    #instructions   { color: #999; font-size: 9pt; margin-left: 1em; margin-top: 0.5em; }
+    #instructions b { color: #DDD; }
+    @media screen and (min-width:     0px) and (min-height:    0px) { .prompt-container, #tower { width:  320px; height: 240px; font-size:  9pt; } } /* pr edit - block = 10 */
+    @media screen and (min-width:   408px) and (min-height:  288px) { .prompt-container, #tower { width:  408px; height: 288px; font-size:  9pt; } } /* pr edit - block = 12 */
+    @media screen and (min-width:   512px) and (min-height:  384px) { .prompt-container, #tower { width:  512px; height: 384px; font-size:  9pt; } } /* pr edit - block = 16 */
+
+    @media screen and (min-width:   640px) and (min-height:  480px) { .prompt-container, #tower { width:  640px; height: 480px; font-size:  9pt; } } /* block = 20 */
+    @media screen and (min-width:   968px) and (min-height:  626px) { .prompt-container, #tower { width:  768px; height: 576px; font-size: 11pt; } } /* block = 24 */
+    @media screen and (min-width:  1096px) and (min-height:  722px) { .prompt-container, #tower { width:  896px; height: 672px; font-size: 13pt; } } /* block = 28 */
+    @media screen and (min-width:  1224px) and (min-height:  818px) { .prompt-container, #tower { width: 1024px; height: 768px; font-size: 15pt; } } /* block = 32 */
+
+    #mobilebuttons{ display: none; }
+
+    @media only screen and (max-device-width: 1200px){
+      #mobilebuttons{ display: block; }
+
+      /* disable selection on mobile to prevent bugs */
+      *{
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    }
+
+    .prompt-container{
+      position: relative;
+      margin: 4em auto;
+      height: 0;
+    }
+    .name-prompt{
+      width: 100%;
+    	position: absolute;
+      padding: 2em 1em;
+    	background-color: #eee;
+    	z-index: 3;
+    }
+
+    .player-selection{
+    	display: inline-block;
+    	width: 100%;
+    	padding: 0;
+    	list-style-type: none;
+    	margin: 20px auto 0 auto;
+    }
+    .checkbox{
+      margin: 2em 2em;
+    }
+
+
+    .player-select label{
+    	display: inline-block;
+    	margin: 10px 0;
+    	width: 100%;
+    	text-align: center;
+    }
+
+    .player-selection li{
+    	display: inline-block;
+    	float: left;
+    	width: 33%;
+    	text-align: center;
+    	cursor: pointer;
+    	border: 2px solid #eee;
+    	padding: 10px 0;
+    }
+
+    .player-selection li.selected{
+    	border: 2px solid #158cba;
+    	-webkit-border-radius: 5px;
+    	   -moz-border-radius: 5px;
+    		 -o-border-radius: 5px;
+    			border-radius: 5px;
+    	border-radius: 5px;
+    }
+    #mobilebuttons{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    #overlay{
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+    #mobilebuttons button{
+      font-size: 2em;
+      position: absolute;
+    }
+    #mobilebuttons .left{
+      left: 3%;
+      top: 50%;
+    }
+    #mobilebuttons .right{
+      right: 3%;
+      top: 50%;
+    }
+    #mobilebuttons .up{
+      top: 3%;
+      left: 45%;
+    }
+    #mobilebuttons .down{
+      top: auto;
+      bottom: 3%;
+      left: 20%;
+    }
+    #mobilebuttons .jump{
+      top: auto;
+      bottom: 3%;
+      right: 20%;
+    }
+    div.stories{
+      display: none;
+    }
+    .stories div{
+      display: inline-block;
+      padding-right: 20px;
+      text-align: center;
+    }
+    div.enemylink{
+      overflow: hidden;
+      height: 50px;
+      display: inline-block;
+      border: 2px solid #ccc;
+      border-radius: 3px;
+      padding: 0;
+      text-align: left;
+    }
+    div.stories p{
+      margin: 0 2px;
+    }
+    div.enemylink img{
+      width: 836px;
+      height: 50px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="prompt-container">
+    <div id="prompt" class="name-prompt">
+  	    <div class="player-select col-md-12">
+  	    	<h2>Choisissez votre candidat:</h2>
+  	      	<ul class="player-selection col-md-12">
+  	      		<li class="selected" data-player="moret">
+  	      			<img src="images/prompt/moret_front.png"><br />
+  							Isabelle Moret
+  	      		</li>
+  	      		<li data-player="maudet">
+  	      			<img src="images/prompt/maudet_front.png"><br />
+  							Pierre Maudet
+  	      		</li>
+  	      		<li data-player="cassis">
+                <img src="images/prompt/cassis_front.png"><br />
+  							Ignazio Cassis
+  	      		</li>
+  	      	</ul>
+  					</div>
+            <div class="checkbox col-md-12">
+              <label class="fullwidth"><input id="music" type="checkbox">Musique 🎵</label>
+            </div>
+            <div class="center-block">
+              <input class="btn btn-primary center-block col-md-12" type="submit" id="playButton" value="C’est parti !" />
+            </div>
+      	</div>
+	</div>
+
+  <div id="overlay"></div>
+
+  <div id="tower" class="mobilebuttons">
+    <div id="mobilebuttons">
+      <button data-mv="left" class="left glyphicon glyphicon-arrow-left"></button>
+      <button data-mv="right" class="right glyphicon glyphicon-arrow-right"></button>
+      <button data-mv="up" class="up glyphicon glyphicon-arrow-up"></button>
+      <button data-mv="down" class="down glyphicon glyphicon-arrow-down"></button>
+      <button data-mv="jump" class="jump glyphicon glyphicon-open"></button>
+    </div>
+
+    <div id="hud">
+      <table>
+        <tr><td><img id="coin" src=""></td><td class="scorecontainer"><span id="score"></span></td></tr>
+      </table>
+    </div>
+
+    <canvas id="canvas">
+      <div class="unsupported">
+        Votre navigateur ne prend malheureusement pas en charge la technologie nécessaire au jeu.
+      </div>
+    </canvas>
+
+    <div id="instructions">
+      <p><b>Touches fléchées</b> pour bouger, <b>espace</b> pour sauter. Recueillez au moins <b>124 voix</b> pour pouvoir entrer au palais fédéral!</p>
+      <p>Animations: Pascal Wassmer et Philippe Forney, adaptation du code: Paul Ronga, photos: Keystone, musique: <a href="http://freemusicarchive.org/music/Visager/Songs_From_An_Unmade_World_2/Visager_-_Songs_From_An_Unmade_World_2_-_04_Factory_Time">Factory Time</a> par Visager.
+        Basé sur le jeu <a href="https://github.com/jakesgordon/javascript-tower-platformer">Javascript Tower Platformer</a> par Jakes Gordon, inspiré par <a href="https://fr.wikipedia.org/wiki/Nebulus">Nebulus (Tower Toppler)</a>. Musique: 8 Bit Raceway par Wizwars.</p>
+      <p>Sources (licence MIT) sur <a target="_blank" href="https://github.com/palrogg/minijeu-course-conseil-federal">GitHub</a></p>
+      <span id="debug"></span>
+
+      <div class="stories stories_cassis">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Ignazio Cassis:</h4>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/suisse/Le-Tessin-et-plus-de-femmes-au-gouvernement/story/30730019"><img src="images/monster_cassis.png" style="margin-left: 0px; margin-right: -50px" /></a></div><p>Parité</p></div>
+      <div><div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.tdg.ch/suisse/plan-secret-elire-isabelle-moret/story/11809943"><img src="images/monster_cassis.png" style="margin-left: -100px; margin-right: -176px" /></a></div><p>«Filippo»</p></div>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/geneve/actu-genevoise/google-isabelle-moret-double-pierre-maudet/story/31791964"><img src="images/monster_cassis.png" style="margin-left: -404px; margin-right: -454px" /></a></div><p>Vaud</p></div>
+      <div><div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.tdg.ch/suisse/ignazio-cassis-renonce-passeport-italien/story/15875312"><img src="images/monster_cassis.png" style="margin-left: -604px; margin-right: -662px" /></a></div><p>Passeport</p></div>
+      </div>
+      <div class="stories stories_maudet">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Pierre Maudet:</h4>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/suisse/Le-Tessin-et-plus-de-femmes-au-gouvernement/story/30730019"><img src="images/monster_maudet.png" style="margin-left: 0px; margin-right: -50px" /></a></div><p>Parité</p></div>
+      <div><div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.tdg.ch/suisse/plan-secret-elire-isabelle-moret/story/11809943"><img src="images/monster_maudet.png" style="margin-left: -100px; margin-right: -176px" /></a></div><p>«Filippo»</p></div>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/suisse/Le-Tessin-et-plus-de-femmes-au-gouvernement/story/30730019"><img src="images/monster_maudet.png" style="margin-left: -404px; margin-right: -454px" /></a></div><p>Tessin</p></div>
+      <div><div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.tdg.ch/geneve/actu-genevoise/pierre-maudet-candidat-conseil-federal-berne-parler-sujets-fond/story/22241312"><img src="images/monster_maudet.png" style="margin-left: -604px; margin-right: -662px" /></a></div><p>UE</p></div>
+      </div>
+      <div class="stories stories_moret">
+      <h4>Lire des articles sur les «ennemis» qu’affronte Isabelle Moret:</h4>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/suisse/louvoiements-moret-liens-interets/story/24816582"><img src="images/monster_moret.png" style="margin-left: 0px; margin-right: -50px" /></a></div><p>Hôpitaux</p></div>
+      <div><div class="enemylink" style="width: 76px;"><a target="_blank" href="https://www.tdg.ch/suisse/conseil-federal-femmes-droite-marche/story/29375081"><img src="images/monster_moret.png" style="margin-left: -100px; margin-right: -176px" /></a></div><p>Karin Keller-Sutter</p></div>
+      <div><div class="enemylink" style="width: 50px;"><a target="_blank" href="https://www.tdg.ch/suisse/heure-verite-isabelle-moret-pierre-maudet/story/26753980"><img src="images/monster_moret.png" style="margin-left: -404px; margin-right: -454px" /></a></div><p>Tessin</p></div>
+      <div><div class="enemylink" style="width: 58px;"><a target="_blank" href="https://www.tdg.ch/suisse/L-heure-de-verite-pour-Isabelle-Moret-et-Pierre-Maudet/story/26753980"><img src="images/monster_moret.png" style="margin-left: -604px; margin-right: -662px" /></a></div><p>Genève</p></div>
+      </div>
+
+    </div>
+
+  </div>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="js/fpsmeter.min.js"></script>
+  <script src="js/common.js"></script>
+  <!--<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '480377685650907',
+      xfbml      : true,
+      version    : 'v2.10'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>-->
+  <script src="js/tower.js?700"></script>
+
+  <div style="height: 1px; width: 100%;"><!-- Container for Metrix -->
+
+  <!-- Google Analytics -->
+  <script type="text/javascript" src="https://ssl.google-analytics.com/ga.js" ></script>
+  <script type="text/javascript">
+    if (typeof(_gat) == 'object') {
+      var pageTracker = _gat._getTracker("UA-4263654-1");
+      pageTracker._setDomainName("tdg.ch");
+      pageTracker._initData();
+      pageTracker._trackPageview();
+      var secondTracker = _gat._getTracker("UA-431029-7");
+      secondTracker._setDomainName("none");
+      secondTracker._setAllowLinker(true);
+      secondTracker._initData();
+      secondTracker._trackPageview();
+    }
+  </script>
+
+  <!-- Google Tag Manager -->
+  <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-TBNVCG"
+  height="0" width="0"
+  style="display:none;visibility:hidden"></iframe></noscript>
+  <script defer>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var
+  f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j
+  ,f);
+  })(window,document,'script','gaParamD','GTM-TBNVCG');</script>
+  <!-- End Google Tag Manager -->
+
+</body>
+</html>
